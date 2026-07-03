@@ -36,7 +36,8 @@ export default function LoginPage() {
         id: rep.id,
         name: rep.name,
         email: rep.email,
-        distributorId: rep.distributorId
+        distributorId: rep.distributorId,
+        role: rep.role
       }));
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
@@ -78,7 +79,7 @@ export default function LoginPage() {
 
       <div style={{ marginTop: 18, padding: 12, backgroundColor: '#f5f5f5', borderRadius: 6, color: '#666' }}>
         <p><strong>Demo credentials</strong></p>
-        <p>Email: john@pasalho.com  Password: pass123</p>
+        <p>Email: ram@pasalho.com  Password: pass123</p>
       </div>
     </main>
   );
