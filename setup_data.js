@@ -28,11 +28,11 @@ async function setup() {
     const hashed = bcrypt.hashSync(plain, 8);
 
     await pool.query(`
-      INSERT INTO "SalesRep" ("distributorId", name, email, phone, password)
+      INSERT INTO "SalesRep" ("distributorId", name, email, phone, password, role)
       VALUES 
-        ('pasalho-001', 'Ram Shrestha', 'ram@pasalho.com', '9841111111', $1),
-        ('pasalho-001', 'Sita Thapa', 'sita@pasalho.com', '9842222222', $1),
-        ('pasalho-001', 'Hari Gurung', 'hari@pasalho.com', '9843333333', $1)
+        ('pasalho-001', 'Ram Shrestha', 'ram@pasalho.com', '9841111111', $1, 'admin'),
+        ('pasalho-001', 'Sita Thapa', 'sita@pasalho.com', '9842222222', $1, 'rep'),
+        ('pasalho-001', 'Hari Gurung', 'hari@pasalho.com', '9843333333', $1, 'rep')
     `, [hashed]);
     console.log('✓ Sales reps created');
 
