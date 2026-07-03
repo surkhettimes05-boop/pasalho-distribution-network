@@ -1,6 +1,7 @@
 {
   "name": "Pasalho Order Capture",
   "short_name": "Pasalho",
+  "description": "Field sales order capture platform for FMCG distributors",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
