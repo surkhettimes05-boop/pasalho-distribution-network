@@ -69,8 +69,14 @@ export default function HomePage() {
           fetch('/api/retailers'),
           fetch('/api/products')
         ]);
-        if (retRes.ok) setRetailers(await retRes.json());
-        if (prodRes.ok) setProducts(await prodRes.json());
+        if (retRes.ok) {
+          const retData = await retRes.json();
+          setRetailers(Array.isArray(retData) ? retData : (retData.retailers || []));
+        }
+        if (prodRes.ok) {
+          const prodData = await prodRes.json();
+          setProducts(Array.isArray(prodData) ? prodData : (prodData.products || []));
+        }
       } catch (err) {
         console.error('Failed to load catalog');
       }
