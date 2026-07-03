@@ -164,8 +164,8 @@ export default function HomePage() {
   };
 
   const saveOrder = async () => {
-    if (!selectedRetailerId || draftItems.length === 0) {
-        setMessage('Missing retailer or items.');
+    if (!selectedRetailer || draftItems.length === 0) {
+        setMessage('Missing or invalid retailer.');
         setTimeout(() => setMessage(''), 3000);
         return;
     }
@@ -428,7 +428,7 @@ export default function HomePage() {
             </div>
             <button
               onClick={() => {
-                if (!selectedRetailerId) {
+                if (!selectedRetailer) {
                   setShowRetailerPicker(true);
                   return;
                 }
