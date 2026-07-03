@@ -2,11 +2,13 @@ import { Pool, type PoolConfig } from 'pg';
 
 const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
 
+const isLocal = connectionString ? (connectionString.includes('localhost') || connectionString.includes('127.0.0.1')) : true;
+
 const poolConfig: PoolConfig = connectionString
   ? {
       connectionString,
       ssl:
-        process.env.POSTGRES_SSL === 'true'
+        !isLocal || process.env.POSTGRES_SSL === 'true'
           ? { rejectUnauthorized: false }
           : undefined
     }
