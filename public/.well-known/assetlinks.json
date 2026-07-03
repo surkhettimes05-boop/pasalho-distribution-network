@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.vercel.pasalho_distribution_network_jdis5kw6t_pramod_kcs_projects.twa",
+    "sha256_cert_fingerprints": ["C6:4E:E0:78:52:43:27:4A:05:13:36:82:7B:D4:1D:52:9E:B8:6C:E6:BD:56:AF:D1:8E:45:03:55:20:D0:43:25"]
+  }
+}]
