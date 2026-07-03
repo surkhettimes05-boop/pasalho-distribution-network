@@ -1,21 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  /* Color Palette (Nepali Field-Sales Context) */
-  --color-brand: #EA580C; /* Marigold/Sindoor Orange */
-  --color-brand-active: #C2410C;
-  --color-bg: #FAFAF9; /* Dust/Sand Off-White */
+  --color-brand: #EA580C;
+  --color-brand-hover: #C2410C;
   --color-surface: #FFFFFF;
-  --color-ink: #1E293B; /* Charcoal */
+  --color-background: #FAFAF9;
+  --color-ink: #1E293B;
   --color-ink-muted: #64748B;
-  --color-success: #16A34A; /* Teak Green */
   --color-border: #E2E8F0;
+  --color-success: #16A34A;
+  --color-danger: #DC2626;
 }
 
-html, body {
+body {
+  background-color: var(--color-background);
+  color: var(--color-ink);
+  font-family: 'Inter', -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
   padding: 0;
   margin: 0;
-  background: var(--color-bg);
-  color: var(--color-ink);
-  font-family: var(--font-inter), sans-serif;
   -webkit-tap-highlight-color: transparent;
 }
 

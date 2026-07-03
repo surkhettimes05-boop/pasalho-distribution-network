@@ -8,7 +8,7 @@ async function setup() {
     // Create Pasalho distributor
     await pool.query(`
       INSERT INTO "Distributor" (id, name, location, "pricingTier")
-      VALUES ('pasalho-001', 'Pasalho Distribution Network', 'Nairobi', 'premium')
+      VALUES ('pasalho-001', 'Pasalho Distribution Network', 'Surkhet', 'premium')
       ON CONFLICT DO NOTHING;
     `);
     console.log('✓ Distributor created');
@@ -26,9 +26,9 @@ async function setup() {
         ($11, $12, $13, $14, $15)
       ON CONFLICT DO NOTHING;
     `, [
-      'pasalho-001', 'John Kipchoge', 'john@pasalho.com', '0712345678', hashed,
-      'pasalho-001', 'Alice Mwangi', 'alice@pasalho.com', '0723456789', hashed,
-      'pasalho-001', 'Peter Omondi', 'peter@pasalho.com', '0734567890', hashed
+      'pasalho-001', 'Ram Shrestha', 'ram@pasalho.com', '9841111111', hashed,
+      'pasalho-001', 'Sita Thapa', 'sita@pasalho.com', '9842222222', hashed,
+      'pasalho-001', 'Hari Gurung', 'hari@pasalho.com', '9843333333', hashed
     ]);
     console.log('✓ Sales reps created');
 
@@ -36,9 +36,9 @@ async function setup() {
     await pool.query(`
       INSERT INTO "Retailer" ("distributorId", name, location, phone)
       VALUES 
-        ('pasalho-001', 'Asha Traders', 'Main Market', '0712111111'),
-        ('pasalho-001', 'Kibera Store', 'Kibera', '0712222222'),
-        ('pasalho-001', 'Eastleigh Supermarket', 'Eastleigh', '0712333333')
+        ('pasalho-001', 'Surkhet Kirana Pasal', 'Birendranagar', '9851111111'),
+        ('pasalho-001', 'Birendranagar General Store', 'Surkhet Bazar', '9852222222'),
+        ('pasalho-001', 'Karnali Traders', 'Chinchu', '9853333333')
       ON CONFLICT DO NOTHING;
     `);
     console.log('✓ Retailers created');
@@ -47,9 +47,11 @@ async function setup() {
     await pool.query(`
       INSERT INTO "Product" ("distributorId", name, price, unit)
       VALUES 
-        ('pasalho-001', 'Sugar 50kg', 1200, 'bag'),
-        ('pasalho-001', 'Rice 25kg', 1800, 'bag'),
-        ('pasalho-001', 'Cooking Oil 20L', 3200, 'jerican')
+        ('pasalho-001', 'Sugar 50kg', 4200, 'bag'),
+        ('pasalho-001', 'Jeera Masino Rice 25kg', 2250, 'bag'),
+        ('pasalho-001', 'Sunflower Oil 20L', 4500, 'jerican'),
+        ('pasalho-001', 'Wai Wai Noodles (Carton)', 1100, 'carton'),
+        ('pasalho-001', 'Lifebuoy Soap (Pack of 12)', 480, 'pack')
       ON CONFLICT DO NOTHING;
     `);
     console.log('✓ Products created');
