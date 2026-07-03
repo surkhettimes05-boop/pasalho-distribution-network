@@ -1,19 +1,53 @@
+:root {
+  /* Color Palette (Nepali Field-Sales Context) */
+  --color-brand: #EA580C; /* Marigold/Sindoor Orange */
+  --color-brand-active: #C2410C;
+  --color-bg: #FAFAF9; /* Dust/Sand Off-White */
+  --color-surface: #FFFFFF;
+  --color-ink: #1E293B; /* Charcoal */
+  --color-ink-muted: #64748B;
+  --color-success: #16A34A; /* Teak Green */
+  --color-border: #E2E8F0;
+}
+
 html, body {
   padding: 0;
   margin: 0;
-  background: #f7f8fa;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-inter), sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
 * {
   box-sizing: border-box;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-outfit), sans-serif;
+  margin: 0;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes checkmarkDraw {
+  0% { stroke-dashoffset: 50; }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* Base mobile tweaks */
 @media (max-width: 768px) {
   body {
-    font-size: 15px;
-  }
-
-  main {
-    padding: 16px;
+    font-size: 16px; /* slightly larger for readability outdoors */
   }
 }

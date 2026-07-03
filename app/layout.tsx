@@ -1,11 +1,18 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Outfit } from 'next/font/google';
+import { Outfit, Inter } from 'next/font/google';
 import Navbar from './components/Navbar';
 
 const outfit = Outfit({
   subsets: ['latin'],
   display: 'swap',
+  variable: '--font-outfit',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
@@ -21,11 +28,11 @@ export const viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={outfit.className}>
+    <html lang="en" className={`${outfit.variable} ${inter.variable}`}>
       <head>
         <link rel="icon" type="image/png" href="/favicon.png" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#0070f3" />
+        <meta name="theme-color" content="#EA580C" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <script
           dangerouslySetInnerHTML={{
@@ -39,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body style={{ fontFamily: 'inherit', background: '#f8fafc', margin: 0, padding: 0 }}>
+      <body style={{ margin: 0, padding: 0 }}>
         <Navbar />
         {children}
       </body>
