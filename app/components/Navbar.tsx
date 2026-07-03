@@ -179,15 +179,15 @@ export default function Navbar() {
           })}
           {isAdmin && (
             <Link
-              href="/admin/backup"
+              href="/admin/orders"
               style={{
-                color: pathname === '/admin/backup' ? '#f472b6' : '#94a3b8',
+                color: pathname.startsWith('/admin') ? '#f472b6' : '#94a3b8',
                 textDecoration: 'none',
                 fontSize: '0.85rem',
                 fontWeight: 600,
                 padding: '0.4rem 0.6rem',
                 borderRadius: '6px',
-                background: pathname === '/admin/backup' ? 'rgba(244, 114, 182, 0.15)' : 'transparent',
+                background: pathname.startsWith('/admin') ? 'rgba(244, 114, 182, 0.15)' : 'transparent',
                 transition: 'all 0.2s',
                 whiteSpace: 'nowrap'
               }}
@@ -271,22 +271,22 @@ export default function Navbar() {
 
         {isAdmin && (
           <Link
-            href="/admin/backup"
+            href="/admin/orders"
             onClick={() => setMenuOpen(false)}
             style={{
-              color: pathname === '/admin/backup' ? '#f472b6' : '#cbd5e1',
+              color: pathname.startsWith('/admin') ? '#f472b6' : '#cbd5e1',
               textDecoration: 'none',
               fontSize: '1rem',
               fontWeight: 600,
               padding: '0.85rem 1rem',
               borderRadius: '8px',
-              background: pathname === '/admin/backup' ? 'rgba(244, 114, 182, 0.15)' : 'transparent',
+              background: pathname.startsWith('/admin') ? 'rgba(244, 114, 182, 0.15)' : 'transparent',
               transition: 'all 0.2s',
               display: 'block',
               marginBottom: '0.25rem'
             }}
           >
-            ⚙️ DB Backup (Admin)
+            ⚙️ Admin Dashboard
           </Link>
         )}
 
