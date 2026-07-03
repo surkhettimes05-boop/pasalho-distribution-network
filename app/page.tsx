@@ -6,17 +6,22 @@ import { saveDraftOrder, getDraftOrders, deleteDraftOrder } from '@/lib/localSyn
 
 // --- Local Storage Hooks for Persistence ---
 function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<React.SetStateAction<T>>] {
-  const [value, setValue] = useState<T>(() => {
-    if (typeof window !== 'undefined') {
-      const stickyValue = window.localStorage.getItem(key);
-      return stickyValue !== null ? JSON.parse(stickyValue) : defaultValue;
-    }
-    return defaultValue;
-  });
+  const [value, setValue] = useState<T>(defaultValue);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  }, [key, value]);
+    const stickyValue = window.localStorage.getItem(key);
+    if (stickyValue !== null) {
+      try { setValue(JSON.parse(stickyValue)); } catch (e) {}
+    }
+    setIsMounted(true);
+  }, [key]);
+
+  useEffect(() => {
+    if (isMounted) {
+      window.localStorage.setItem(key, JSON.stringify(value));
+    }
+  }, [key, value, isMounted]);
 
   return [value, setValue];
 }
