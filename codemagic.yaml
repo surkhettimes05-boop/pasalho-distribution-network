@@ -1,0 +1,24 @@
+workflows:
+  android-apk-build:
+    name: Pasalho DNP Android Build
+    instance_type: mac_mini_m1
+    environment:
+      node: 20
+      java: 17
+    scripts:
+      - name: Install Dependencies
+        script: |
+          npm install
+      - name: Build Web Application
+        script: |
+          npm run build
+      - name: Next Steps for APK
+        script: |
+          echo "Next.js build complete."
+          echo "To generate the final .apk, we will need to wrap this PWA using Bubblewrap or Capacitor in the next steps."
+    artifacts:
+      - .next/**
+    publishing:
+      email:
+        recipients:
+          - surkhettimes05@gmail.com
