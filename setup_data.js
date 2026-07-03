@@ -1,8 +1,7 @@
 const { Pool } = require('pg');
 
-const pool = new Pool({
-  connectionString: 'postgresql://postgres:pkdon123@localhost:5432/pasalho'
-});
+const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL || 'postgresql://postgres:pkdon123@localhost:5432/pasalho';
+const pool = new Pool({ connectionString });
 
 async function setup() {
   try {
