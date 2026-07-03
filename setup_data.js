@@ -5,11 +5,20 @@ const pool = new Pool({ connectionString });
 
 async function setup() {
   try {
+    console.log('Cleaning up old data...');
+    // Delete in reverse dependency order
+    await pool.query('DELETE FROM "Inventory"');
+    await pool.query('DELETE FROM "OrderItem"');
+    await pool.query('DELETE FROM "Order"');
+    await pool.query('DELETE FROM "Product"');
+    await pool.query('DELETE FROM "Retailer"');
+    await pool.query('DELETE FROM "SalesRep"');
+    await pool.query('DELETE FROM "Distributor"');
+
     // Create Pasalho distributor
     await pool.query(`
       INSERT INTO "Distributor" (id, name, location, "pricingTier")
       VALUES ('pasalho-001', 'Pasalho Distribution Network', 'Surkhet', 'premium')
-      ON CONFLICT DO NOTHING;
     `);
     console.log('✓ Distributor created');
 
@@ -21,15 +30,10 @@ async function setup() {
     await pool.query(`
       INSERT INTO "SalesRep" ("distributorId", name, email, phone, password)
       VALUES 
-        ($1, $2, $3, $4, $5),
-        ($6, $7, $8, $9, $10),
-        ($11, $12, $13, $14, $15)
-      ON CONFLICT DO NOTHING;
-    `, [
-      'pasalho-001', 'Ram Shrestha', 'ram@pasalho.com', '9841111111', hashed,
-      'pasalho-001', 'Sita Thapa', 'sita@pasalho.com', '9842222222', hashed,
-      'pasalho-001', 'Hari Gurung', 'hari@pasalho.com', '9843333333', hashed
-    ]);
+        ('pasalho-001', 'Ram Shrestha', 'ram@pasalho.com', '9841111111', $1),
+        ('pasalho-001', 'Sita Thapa', 'sita@pasalho.com', '9842222222', $1),
+        ('pasalho-001', 'Hari Gurung', 'hari@pasalho.com', '9843333333', $1)
+    `, [hashed]);
     console.log('✓ Sales reps created');
 
     // Create retailers
@@ -39,12 +43,11 @@ async function setup() {
         ('pasalho-001', 'Surkhet Kirana Pasal', 'Birendranagar', '9851111111'),
         ('pasalho-001', 'Birendranagar General Store', 'Surkhet Bazar', '9852222222'),
         ('pasalho-001', 'Karnali Traders', 'Chinchu', '9853333333')
-      ON CONFLICT DO NOTHING;
     `);
     console.log('✓ Retailers created');
 
     // Create products
-    await pool.query(`
+    const productInsert = await pool.query(`
       INSERT INTO "Product" ("distributorId", name, price, unit)
       VALUES 
         ('pasalho-001', 'Sugar 50kg', 4200, 'bag'),
@@ -52,10 +55,18 @@ async function setup() {
         ('pasalho-001', 'Sunflower Oil 20L', 4500, 'jerican'),
         ('pasalho-001', 'Wai Wai Noodles (Carton)', 1100, 'carton'),
         ('pasalho-001', 'Lifebuoy Soap (Pack of 12)', 480, 'pack')
-      ON CONFLICT DO NOTHING;
+      RETURNING id, "distributorId"
     `);
     console.log('✓ Products created');
 
+    // Create inventory
+    for (const p of productInsert.rows) {
+      await pool.query(`
+        INSERT INTO "Inventory" ("distributorId", "productId", "stockOnHand", "lowStockThreshold")
+        VALUES ($1, $2, $3, $4)
+      `, [p.distributorId, p.id, 500, 50]);
+    }
+    console.log('✓ Inventory seeded');
     console.log('\n✓ Database setup complete!');
     process.exit(0);
   } catch (err) {
