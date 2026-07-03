@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Distributor {
+  id           String   @id @default(cuid())
+  name         String
+  location     String
+  pricingTier  String
+  createdAt    DateTime @default(now())
+  products     Product[]
+  retailers    Retailer[]
+  orders       Order[]
+  inventory    Inventory[]
+}
+
+model Product {
+  id                Int        @id @default(autoincrement())
+  distributorId     String
+  name              String
+  price             Int
+  unit              String
+  distributor       Distributor @relation(fields: [distributorId], references: [id])
+  inventory         Inventory[]
+  orderItems        OrderItem[]
+  createdAt         DateTime   @default(now())
+}
+
+model Retailer {
+  id            Int       @id @default(autoincrement())
+  distributorId String
+  name          String
+  location      String
+  phone         String
+  distributor   Distributor @relation(fields: [distributorId], references: [id])
+  orders        Order[]
+  createdAt     DateTime  @default(now())
+}
+
+model Inventory {
+  id                  Int         @id @default(autoincrement())
+  distributorId       String
+  productId           Int
+  stockOnHand         Int
+  lowStockThreshold   Int
+  distributor         Distributor @relation(fields: [distributorId], references: [id])
+  product             Product     @relation(fields: [productId], references: [id])
+  createdAt           DateTime    @default(now())
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  distributorId   String
+  retailerId      Int
+  status          String
+  paymentStatus   String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  distributor     Distributor @relation(fields: [distributorId], references: [id])
+  retailer        Retailer    @relation(fields: [retailerId], references: [id])
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  productId   Int
+  quantity    Int
+  order       Order    @relation(fields: [orderId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id])
+}
