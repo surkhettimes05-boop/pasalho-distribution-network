@@ -186,20 +186,29 @@ export default function HomePage() {
         })
       });
 
-      if (!response.ok) throw new Error('Failed to save');
+      if (!response.ok) {
+        let errData;
+        try { errData = await response.json(); } catch (e) {}
+        throw new Error(errData?.error || `Server error: ${response.status}`);
+      }
 
       const order = await response.json();
       setDraftItems([]);
       setSelectedRetailerId('');
       setMessage(`✓ Order #${order.id} saved successfully`);
-    } catch (err) {
-      // Save offline draft instead
-      const draftId = `draft-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-      await saveDraftOrder(draftId, { id: draftId, ...orderBody });
-      await loadOfflineDrafts();
-      setDraftItems([]);
-      setSelectedRetailerId('');
-      setMessage('⚠️ Device is offline. Saved order locally as a draft.');
+    } catch (err: any) {
+      if (err.message === 'Offline' || err.message.toLowerCase().includes('fetch') || err.message.toLowerCase().includes('network')) {
+        // Save offline draft instead
+        const draftId = `draft-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+        await saveDraftOrder(draftId, { id: draftId, ...orderBody });
+        await loadOfflineDrafts();
+        setDraftItems([]);
+        setSelectedRetailerId('');
+        setMessage('⚠️ Device is offline. Saved order locally as a draft.');
+      } else {
+        // Show actual server error
+        setMessage(`⚠️ Error: ${err.message}`);
+      }
     } finally {
       setLoading(false);
     }

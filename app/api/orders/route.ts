@@ -72,12 +72,15 @@ export async function POST(request: Request) {
         );
       }
 
-      // Enqueue background processing job for the order
+      // Enqueue background processing job for the order without hanging
       try {
         const { orderQueue } = await import('@/lib/queue');
-        await orderQueue.add('processOrder', { orderId });
-      } catch (e) {
-        console.error('Failed to enqueue order job:', e);
+        await Promise.race([
+          orderQueue.add('processOrder', { orderId }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Redis connection timeout')), 2000))
+        ]);
+      } catch (e: any) {
+        console.error('Failed to enqueue order job:', e.message || e);
       }
       
       await client.query('COMMIT');
