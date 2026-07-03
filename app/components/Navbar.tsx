@@ -65,16 +65,12 @@ export default function Navbar() {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
         <Link href="/" style={{
-          fontSize: '1.25rem',
-          fontWeight: 800,
-          background: 'linear-gradient(135deg, #a78bfa 0%, #6366f1 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
           textDecoration: 'none',
-          letterSpacing: '-0.025em',
-          transition: 'opacity 0.2s'
+          transition: 'opacity 0.2s',
+          display: 'flex',
+          alignItems: 'center'
         }}>
-          Pasalho DNP
+          <img src="/logo-full.png" alt="Pasalho DNP" style={{ height: '32px', width: 'auto' }} />
         </Link>
 
         <nav style={{ display: 'flex', gap: '1rem' }}>

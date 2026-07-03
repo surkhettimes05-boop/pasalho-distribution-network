@@ -50,6 +50,9 @@ export default function LoginPage() {
 
   return (
     <main style={{ maxWidth: '480px', margin: '4rem auto', padding: '2rem' }}>
+      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+        <img src="/logo-full.png" alt="Pasalho DNP" style={{ height: '48px', width: 'auto', marginBottom: '1rem' }} />
+      </div>
       <h1>Rep Sign In</h1>
       <p style={{ color: '#666', marginBottom: '1.5rem' }}>Sign in with your email and password</p>
 
