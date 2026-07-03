@@ -13,6 +13,12 @@ export const metadata: Metadata = {
   description: 'Field sales order capture platform'
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={outfit.className}>
