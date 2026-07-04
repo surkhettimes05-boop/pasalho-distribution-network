@@ -17,7 +17,13 @@ export async function POST(request: Request) {
     const payload = verifyToken(refreshToken);
     if (!payload) return NextResponse.json({ error: 'Invalid refresh token' }, { status: 401 });
 
-    const newAccess = signAccessToken({ repId: (payload as any).repId, distributorId: (payload as any).distributorId, name: (payload as any).name });
+    const newAccess = signAccessToken({
+      repId: (payload as any).repId,
+      distributorId: (payload as any).distributorId,
+      name: (payload as any).name,
+      email: (payload as any).email,
+      role: (payload as any).role,
+    });
     return NextResponse.json({ accessToken: newAccess });
   } catch (err: any) {
     console.error('Refresh error:', err);

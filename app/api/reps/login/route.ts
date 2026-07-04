@@ -30,8 +30,8 @@ export async function POST(request: Request) {
 
     const { password: _pw, ...rep } = row;
 
-    // Issue tokens (include role for RBAC)
-    const tokenPayload = { repId: rep.id, distributorId: rep.distributorId, name: rep.name, role: rep.role };
+    // Issue tokens (include role and email for RBAC)
+    const tokenPayload = { repId: rep.id, distributorId: rep.distributorId, name: rep.name, email: rep.email, role: rep.role };
     const accessToken = signAccessToken(tokenPayload);
     const refreshToken = signRefreshToken(tokenPayload);
 

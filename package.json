@@ -12,6 +12,7 @@
     "@types/pg": "^8.20.0",
     "bcryptjs": "^2.4.3",
     "bullmq": "^1.78.0",
+    "exceljs": "^4.4.0",
     "ioredis": "^4.28.5",
     "jsonwebtoken": "^9.0.0",
     "next": "14.2.15",

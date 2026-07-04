@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { isAdminRep } from '@/lib/admin';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
     try {
       const rep = JSON.parse(repData);
-      if (rep.role === 'admin' || rep.email === 'john@pasalho.com') { // Assuming john is legacy admin check
+      if (isAdminRep(rep)) {
         setIsAuthorized(true);
       } else {
         router.push('/');

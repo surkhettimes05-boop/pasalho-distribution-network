@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
 import { getCurrentRepFromAuthHeader } from '@/lib/getCurrentRep';
+import { isAdminRep } from '@/lib/admin';
 
 export const dynamic = 'force-dynamic';
 
 function isAdmin(req: Request) {
   const current = getCurrentRepFromAuthHeader(req);
-  return current && (current.role === 'admin' || current.email === 'john@pasalho.com');
+  return isAdminRep(current);
 }
 
 export async function GET(request: Request) {
