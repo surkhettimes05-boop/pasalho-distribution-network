@@ -1,47 +1,28 @@
-import { Queue, Worker, QueueScheduler } from 'bullmq';
-import IORedis from 'ioredis';
 import { pool } from './db';
 
-const connection = new IORedis(process.env.REDIS_URL || 'redis://127.0.0.1:6379');
-
-export const orderQueue = new Queue('orderQueue', { connection });
-
-// Initialize queue scheduler once
-if (typeof global !== 'undefined' && !(global as any).queueSchedulerStarted) {
-  (global as any).queueSchedulerStarted = true;
-  new QueueScheduler('orderQueue', { connection });
-}
-
-// Start automated background order worker inside Next.js server process
-if (typeof global !== 'undefined' && !(global as any).orderWorkerStarted) {
-  (global as any).orderWorkerStarted = true;
-  
-  console.log('[Queue Worker] Starting background order processor...');
-  
-  const worker = new Worker(
-    'orderQueue',
-    async (job) => {
-      console.log(`[Queue Worker] Received job: ${job.id} (orderId: ${job.data.orderId})`);
-      const { orderId } = job.data;
-      
-      // Update status to processing
-      await pool.query('UPDATE "Order" SET status = $1 WHERE id = $2', ['processing', orderId]);
-      
-      // Simulate background order fulfillment tasks (e.g. print receipt, notify distributor)
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      
-      // Complete order
-      await pool.query('UPDATE "Order" SET status = $1 WHERE id = $2', ['completed', orderId]);
-      console.log(`[Queue Worker] Finished processing order: ${orderId}`);
-    },
-    { connection }
-  );
-
-  worker.on('completed', (job) => {
-    console.log(`[Queue Worker] Job completed: ${job.id}`);
-  });
-
-  worker.on('failed', (job, err) => {
-    console.error(`[Queue Worker] Job failed: ${job?.id}`, err);
-  });
-}
+// MOCK QUEUE FOR LOCAL DEV (No Redis required)
+export const orderQueue = {
+  add: async (jobName: string, data: any) => {
+    console.log(`[Queue Mock] Enqueued job: ${jobName} for order ${data.orderId}`);
+    
+    // Simulate background worker picking it up after 2 seconds
+    setTimeout(async () => {
+      try {
+        console.log(`[Queue Mock Worker] Received job: ${data.orderId}`);
+        const { orderId } = data;
+        
+        await pool.query('UPDATE "Order" SET status = $1 WHERE id = $2', ['processing', orderId]);
+        
+        // Simulate background work
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        await pool.query('UPDATE "Order" SET status = $1 WHERE id = $2', ['completed', orderId]);
+        console.log(`[Queue Mock Worker] Finished processing order: ${orderId}`);
+      } catch (err) {
+        console.error(`[Queue Mock Worker] Job failed: ${data.orderId}`, err);
+      }
+    }, 2000);
+    
+    return { id: Math.random().toString(36).substring(7) };
+  }
+};

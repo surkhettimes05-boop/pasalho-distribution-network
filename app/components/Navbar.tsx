@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { isAdminRep } from '@/lib/admin';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -51,7 +52,7 @@ export default function Navbar() {
     { label: '👤 Profile', href: '/reps/profile' },
   ];
 
-  const isAdmin = currentRep.role === 'admin' || currentRep.email === 'john@pasalho.com';
+  const isAdmin = isAdminRep(currentRep);
 
   return (
     <>

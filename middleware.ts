@@ -3,6 +3,11 @@ import type { NextRequest } from 'next/server';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
 
+function normalizeRole(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  return value.trim().toLowerCase();
+}
+
 // Simple in-memory rate limiting map for edge requests
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 mins
@@ -112,7 +117,7 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/api/reps/me') ||
     pathname.startsWith('/api/reps/export') ||
     pathname.startsWith('/api/backup') ||
-    pathname.startsWith('/admin');
+    pathname.startsWith('/api/admin');
 
   if (isProtectedApi) {
     const authHeader = request.headers.get('authorization');
@@ -145,9 +150,11 @@ export async function middleware(request: NextRequest) {
       pathname.startsWith('/api/reports') ||
       pathname.startsWith('/api/reps/export') ||
       pathname.startsWith('/api/backup') ||
-      pathname.startsWith('/admin');
+      pathname.startsWith('/api/admin');
 
-    if (isAdminRoute && payload.role !== 'admin' && payload.email !== 'john@pasalho.com') {
+    const role = normalizeRole(payload.role);
+    const email = normalizeRole(payload.email);
+    if (isAdminRoute && !['admin', 'administrator', 'superadmin', 'super-admin', 'owner'].includes(role) && !['john@pasalho.com', 'ram@pasalho.com', 'admin@pasalho.com'].includes(email)) {
       return new NextResponse(JSON.stringify({ error: 'Forbidden: Admin access required' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' },

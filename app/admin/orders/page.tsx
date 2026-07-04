@@ -35,10 +35,56 @@ export default function AdminOrders() {
     fetchOrders();
   };
 
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const token = localStorage.getItem('accessToken');
+      const res = await fetch('/api/admin/orders/export', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        alert('Export failed');
+        return;
+      }
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const today = new Date().toISOString().slice(0, 10);
+      a.download = `pasalho_orders_${today}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Export failed: network error');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div>
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>All Orders (Master View)</h2>
+        <button
+          onClick={handleExport}
+          disabled={exporting}
+          style={{
+            padding: '8px 18px',
+            background: exporting ? '#94a3b8' : '#16a34a',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            fontWeight: 700,
+            fontSize: '0.9rem',
+            cursor: exporting ? 'not-allowed' : 'pointer',
+          }}
+        >
+          {exporting ? '⏳ Exporting...' : '📥 Export to Excel'}
+        </button>
       </div>
 
       {loading ? (
