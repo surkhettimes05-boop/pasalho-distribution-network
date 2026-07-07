@@ -63,6 +63,17 @@ if (typeof global !== 'undefined' && !(global as any).backupIntervalStarted) {
           console.error('[Backup Daemon] Scheduled backup failed:', err.message || err);
         }
       }, intervalMs);
+      
+      // Also schedule Materialized View refreshes (every 10 minutes)
+      setInterval(async () => {
+        try {
+          console.log('[DB Daemon] Refreshing materialized views...');
+          await pool.query('REFRESH MATERIALIZED VIEW CONCURRENTLY daily_sales_view;');
+          await pool.query('REFRESH MATERIALIZED VIEW CONCURRENTLY top_products_view;');
+        } catch (err: any) {
+          console.error('[DB Daemon] Failed to refresh materialized views:', err.message || err);
+        }
+      }, 10 * 60 * 1000);
     }, 10000); // 10 seconds delay
   }
 }

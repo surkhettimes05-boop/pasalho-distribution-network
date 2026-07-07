@@ -5,6 +5,17 @@ export async function saveDraftOrder(key: string, data: any) {
   const tx = db.transaction('drafts', 'readwrite');
   tx.objectStore('drafts').put(data, key);
   await tx.complete;
+
+  // Request background sync
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+    try {
+      const sw = await navigator.serviceWorker.ready;
+      await (sw as any).sync.register('sync-orders');
+      console.log('Background sync registered for draft order');
+    } catch (err) {
+      console.error('Failed to register background sync:', err);
+    }
+  }
 }
 
 export async function getDraftOrders() {
@@ -14,6 +25,18 @@ export async function getDraftOrders() {
   const all = await tx.objectStore('drafts').getAll();
   await tx.complete;
   return all;
+}
+
+export async function updateDraftError(key: string, errorMsg: string) {
+  const db = await openDB();
+  const tx = db.transaction('drafts', 'readwrite');
+  const store = tx.objectStore('drafts');
+  const draft = await store.get(key);
+  if (draft) {
+    draft.syncError = errorMsg;
+    store.put(draft, key);
+  }
+  await tx.complete;
 }
 
 export async function deleteDraftOrder(key: string) {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { saveDraftOrder, getDraftOrders, deleteDraftOrder } from '@/lib/localSync';
+import { saveDraftOrder, getDraftOrders, deleteDraftOrder, updateDraftError } from '@/lib/localSync';
 
 // --- Local Storage Hooks for Persistence ---
 function useStickyState<T>(defaultValue: T, key: string): [T, React.Dispatch<React.SetStateAction<T>>] {
@@ -40,6 +40,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [offlineDrafts, setOfflineDrafts] = useState<any[]>([]);
   const [isOnline, setIsOnline] = useState(true);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   
   // UI States
   const [showReview, setShowReview] = useState(false);
@@ -90,9 +91,17 @@ export default function HomePage() {
     setIsOnline(navigator.onLine);
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, [router]);
 
@@ -128,6 +137,13 @@ export default function HomePage() {
         if (response.ok) {
           await deleteDraftOrder(draft.id);
           successCount++;
+        } else {
+          let errMessage = 'Validation Error';
+          try {
+            const errData = await response.json();
+            errMessage = errData.error || errMessage;
+          } catch(e) {}
+          await updateDraftError(draft.id, errMessage);
         }
       } catch (err) {
         console.error('Failed to sync offline draft:', draft.id, err);
@@ -139,6 +155,9 @@ export default function HomePage() {
     if (successCount > 0) {
       setMessage(`Synced ${successCount} offline orders successfully!`);
       setTimeout(() => setMessage(''), 3000);
+    } else if (offlineDrafts.length > 0) {
+      setMessage('Some orders failed to sync due to stock or validation issues.');
+      setTimeout(() => setMessage(''), 4000);
     }
   };
 
@@ -261,14 +280,74 @@ export default function HomePage() {
       
       {/* Offline Sync Banner */}
       {offlineDrafts.length > 0 && (
-        <div onClick={syncDrafts} style={{
-          background: 'var(--color-brand)', color: 'white', padding: '0.85rem 1rem',
+        <div style={{ padding: '0.5rem' }}>
+          {offlineDrafts.map(draft => (
+            <div key={draft.id} style={{
+              background: draft.syncError ? '#FEE2E2' : 'var(--color-brand)', 
+              color: draft.syncError ? '#991B1B' : 'white', 
+              padding: '0.85rem 1rem', marginBottom: '0.5rem', borderRadius: '12px',
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              fontWeight: 600, fontSize: '0.95rem',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span>{draft.syncError ? '❌ Sync Failed' : '⚠️ Offline Order'}</span>
+                {draft.syncError && <span style={{ fontSize: '0.8rem', opacity: 0.9 }}>{draft.syncError}</span>}
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                {draft.syncError ? (
+                  <>
+                    <button onClick={async () => {
+                      setDraftItems(draft.items);
+                      setSelectedRetailerId(draft.retailerId.toString());
+                      await deleteDraftOrder(draft.id);
+                      await loadOfflineDrafts();
+                    }} style={{ background: '#FECACA', border: 'none', padding: '0.4rem 0.8rem', borderRadius: '8px', color: '#991B1B', fontWeight: 600, cursor: 'pointer' }}>Edit</button>
+                    <button onClick={async () => {
+                      await deleteDraftOrder(draft.id);
+                      await loadOfflineDrafts();
+                    }} style={{ background: 'transparent', border: '1px solid #F87171', padding: '0.4rem 0.8rem', borderRadius: '8px', color: '#991B1B', fontWeight: 600, cursor: 'pointer' }}>Discard</button>
+                  </>
+                ) : (
+                  <button onClick={syncDrafts} disabled={!isOnline || loading} style={{
+                    background: isOnline ? 'white' : 'transparent', 
+                    color: isOnline ? 'var(--color-brand)' : 'white', 
+                    border: isOnline ? 'none' : '1px solid white', 
+                    padding: '0.4rem 1rem', borderRadius: '8px', fontWeight: 700, 
+                    cursor: isOnline ? 'pointer' : 'default', opacity: loading ? 0.7 : 1
+                  }}>
+                    {loading ? 'Syncing...' : isOnline ? 'Sync Now' : 'Offline'}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* PWA Install Banner */}
+      {deferredPrompt && (
+        <div style={{
+          background: '#0F172A', color: 'white', padding: '0.85rem 1rem',
           display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          fontWeight: 600, fontSize: '0.95rem', cursor: isOnline ? 'pointer' : 'default',
-          boxShadow: '0 2px 4px rgba(234,88,12,0.2)'
+          fontWeight: 600, fontSize: '0.95rem'
         }}>
-          <span>⚠️ {offlineDrafts.length} unsynced order(s)</span>
-          <span style={{ opacity: 0.9 }}>{loading ? 'Syncing...' : isOnline ? 'Tap to Sync' : 'Offline'}</span>
+          <span>📱 Install Pasalho App</span>
+          <button 
+            onClick={async () => {
+              if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') setDeferredPrompt(null);
+              }
+            }}
+            style={{ 
+              background: 'var(--color-brand)', color: 'white', border: 'none', 
+              padding: '0.4rem 1rem', borderRadius: '100px', fontWeight: 700, cursor: 'pointer' 
+            }}
+          >
+            Install
+          </button>
         </div>
       )}
 

@@ -9,8 +9,14 @@ export default function AdminProducts() {
   const [editingId, setEditingId] = useState<number | null>(null);
   
   const [name, setName] = useState('');
-  const [price, setPrice] = useState('');
+  const [price, setPrice] = useState(''); // Cost price mapping? The backend expects costPrice/mrp/sellingPrice. Let's map this properly.
   const [unit, setUnit] = useState('');
+  const [mrp, setMrp] = useState('');
+  const [sellingPrice, setSellingPrice] = useState('');
+  const [stock, setStock] = useState('0');
+  const [imageUrl, setImageUrl] = useState('');
+  const [storefrontCategory, setStorefrontCategory] = useState('');
+  const [isActive, setIsActive] = useState(true);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -32,7 +38,18 @@ export default function AdminProducts() {
     e.preventDefault();
     const token = localStorage.getItem('accessToken');
     const method = editingId ? 'PUT' : 'POST';
-    const body = { id: editingId, name, price: Number(price), unit };
+    const body = { 
+      id: editingId, 
+      name, 
+      price: Number(price), 
+      unit,
+      mrp: Number(mrp) || undefined,
+      sellingPrice: Number(sellingPrice) || undefined,
+      stock: Number(stock) || 0,
+      imageUrl: imageUrl || undefined,
+      storefrontCategory: storefrontCategory || undefined,
+      isActive 
+    };
 
     await fetch('/api/admin/products', {
       method,
@@ -46,14 +63,21 @@ export default function AdminProducts() {
     setShowForm(false);
     setEditingId(null);
     setName(''); setPrice(''); setUnit('');
+    setMrp(''); setSellingPrice(''); setStock('0'); setImageUrl(''); setStorefrontCategory(''); setIsActive(true);
     fetchProducts();
   };
 
   const handleEdit = (p: any) => {
     setEditingId(p.id);
-    setName(p.name);
-    setPrice(p.price);
-    setUnit(p.unit);
+    setName(p.name || '');
+    setPrice(p.price || p.costPrice || '');
+    setUnit(p.unit || '');
+    setMrp(p.mrp || '');
+    setSellingPrice(p.sellingPrice || '');
+    setStock(p.stock?.toString() || '0');
+    setImageUrl(p.imageUrl || '');
+    setStorefrontCategory(p.storefrontCategory || '');
+    setIsActive(p.isActive ?? true);
     setShowForm(true);
   };
 
@@ -81,6 +105,30 @@ export default function AdminProducts() {
               <input required value={unit} onChange={e => setUnit(e.target.value)} />
             </div>
             <div>
+              <label style={{ display: 'block' }}>MRP</label>
+              <input type="number" value={mrp} onChange={e => setMrp(e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: 'block' }}>Selling Price</label>
+              <input type="number" value={sellingPrice} onChange={e => setSellingPrice(e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: 'block' }}>Stock</label>
+              <input type="number" value={stock} onChange={e => setStock(e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: 'block' }}>Image URL</label>
+              <input value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: 'block' }}>Category (Q-Comm)</label>
+              <input value={storefrontCategory} onChange={e => setStorefrontCategory(e.target.value)} />
+            </div>
+            <div>
+              <label style={{ display: 'block' }}>Active</label>
+              <input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} />
+            </div>
+            <div>
               <button type="submit">Save</button>
               <button type="button" onClick={() => setShowForm(false)} style={{ marginLeft: '0.5rem' }}>Cancel</button>
             </div>
@@ -97,7 +145,11 @@ export default function AdminProducts() {
               <th style={{ padding: '8px', border: '1px solid #ccc' }}>ID</th>
               <th style={{ padding: '8px', border: '1px solid #ccc' }}>Name</th>
               <th style={{ padding: '8px', border: '1px solid #ccc' }}>Price</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Unit</th>
+              <th style={{ padding: '8px', border: '1px solid #ccc' }}>MRP</th>
+              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Selling Price</th>
+              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Stock</th>
+              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Category</th>
+              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Active</th>
               <th style={{ padding: '8px', border: '1px solid #ccc' }}>Actions</th>
             </tr>
           </thead>
@@ -106,8 +158,12 @@ export default function AdminProducts() {
               <tr key={p.id}>
                 <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.id}</td>
                 <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.name}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.price}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.unit}</td>
+                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.price || p.costPrice}</td>
+                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.mrp}</td>
+                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.sellingPrice}</td>
+                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.stock}</td>
+                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.storefrontCategory}</td>
+                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.isActive ? 'Yes' : 'No'}</td>
                 <td style={{ padding: '8px', border: '1px solid #ccc' }}>
                   <button onClick={() => handleEdit(p)}>Edit</button>
                 </td>

@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Distributor {
@@ -17,6 +16,7 @@ model Distributor {
   retailers    Retailer[]
   orders       Order[]
   inventory    Inventory[]
+  salesReps    SalesRep[]
 }
 
 model Product {
@@ -57,12 +57,14 @@ model Order {
   id              Int         @id @default(autoincrement())
   distributorId   String
   retailerId      Int
+  repId           Int?
   status          String
   paymentStatus   String
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   distributor     Distributor @relation(fields: [distributorId], references: [id])
   retailer        Retailer    @relation(fields: [retailerId], references: [id])
+  salesRep        SalesRep?   @relation(fields: [repId], references: [id])
   items           OrderItem[]
 }
 
@@ -73,4 +75,28 @@ model OrderItem {
   quantity    Int
   order       Order    @relation(fields: [orderId], references: [id])
   product     Product  @relation(fields: [productId], references: [id])
+}
+
+model SalesRep {
+  id            Int         @id @default(autoincrement())
+  distributorId String
+  name          String
+  email         String      @unique
+  phone         String
+  password      String?
+  status        String?     @default("active")
+  role          String?     @default("rep")
+  createdAt     DateTime    @default(now())
+  distributor   Distributor @relation(fields: [distributorId], references: [id])
+  orders        Order[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id          Int       @id @default(autoincrement())
+  tokenHash   String    @unique
+  repId       Int
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  salesRep    SalesRep  @relation(fields: [repId], references: [id], onDelete: Cascade)
 }

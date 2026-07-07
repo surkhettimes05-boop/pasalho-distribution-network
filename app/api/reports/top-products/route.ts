@@ -13,16 +13,13 @@ export async function GET(request: Request) {
   try {
     const result = await pool.query(
       `SELECT 
-        p.id as "productId", 
-        p.name, 
-        p.unit,
-        COALESCE(SUM(oi.quantity), 0)::int as "totalQuantity", 
-        COALESCE(SUM(oi.quantity * p.price), 0)::int as "totalRevenue"
-       FROM "Product" p
-       LEFT JOIN "OrderItem" oi ON p.id = oi."productId"
-       LEFT JOIN "Order" o ON oi."orderId" = o.id AND o.status != 'cancelled'
-       WHERE p."distributorId" = $1
-       GROUP BY p.id, p.name, p.unit
+        "productId", 
+        name, 
+        unit,
+        "totalQuantity", 
+        "totalRevenue"
+       FROM top_products_view
+       WHERE "distributorId" = $1
        ORDER BY "totalQuantity" DESC, "totalRevenue" DESC`,
       [distributorId]
     );

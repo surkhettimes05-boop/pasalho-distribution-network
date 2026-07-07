@@ -13,12 +13,12 @@ export async function GET(request: Request) {
   const end = searchParams.get('end');
 
   const params: any[] = [distributorId];
-  let where = 'WHERE o."distributorId" = $1';
-  if (start) { params.push(start); where += ` AND o."createdAt" >= $${params.length}`; }
-  if (end) { params.push(end); where += ` AND o."createdAt" <= $${params.length}`; }
+  let where = 'WHERE "distributorId" = $1';
+  if (start) { params.push(start); where += ` AND sale_date >= $${params.length}`; }
+  if (end) { params.push(end); where += ` AND sale_date <= $${params.length}`; }
 
   try {
-    const sql = `SELECT oi."productId", p.name, SUM(oi.quantity) as totalQty, SUM(oi.quantity * p.price) as totalValue FROM "OrderItem" oi JOIN "Order" o ON oi."orderId" = o.id JOIN "Product" p ON oi."productId" = p.id ${where} GROUP BY oi."productId", p.name ORDER BY totalQty DESC`;
+    const sql = `SELECT "productId", name, totalQty, totalValue FROM daily_sales_view ${where} ORDER BY totalQty DESC`;
     const res = await pool.query(sql, params);
     return NextResponse.json({ report: res.rows });
   } catch (err: any) {

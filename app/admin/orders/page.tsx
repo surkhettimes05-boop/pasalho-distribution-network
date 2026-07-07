@@ -5,11 +5,18 @@ import { useState, useEffect } from 'react';
 export default function AdminOrders() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sourceFilter, setSourceFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   const fetchOrders = async () => {
     setLoading(true);
     const token = localStorage.getItem('accessToken');
-    const res = await fetch('/api/admin/orders', {
+    
+    let url = '/api/admin/orders?';
+    if (sourceFilter) url += `source=${sourceFilter}&`;
+    if (statusFilter) url += `status=${statusFilter}&`;
+
+    const res = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (res.ok) {
@@ -20,18 +27,30 @@ export default function AdminOrders() {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [sourceFilter, statusFilter]);
 
-  const updateStatus = async (id: number, newStatus: string) => {
+  const updateStatus = async (order: any, newStatus: string) => {
     const token = localStorage.getItem('accessToken');
-    await fetch('/api/admin/orders', {
-      method: 'PATCH',
-      headers: { 
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}` 
-      },
-      body: JSON.stringify({ id, status: newStatus })
-    });
+    
+    if (order.source === 'STOREFRONT') {
+      await fetch(`/api/admin/orders/${order.id}/status`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+    } else {
+      await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` 
+        },
+        body: JSON.stringify({ id: order.id, status: newStatus })
+      });
+    }
     fetchOrders();
   };
 
@@ -87,6 +106,30 @@ export default function AdminOrders() {
         </button>
       </div>
 
+      <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
+        <div>
+          <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '4px' }}>Source</label>
+          <select value={sourceFilter} onChange={e => setSourceFilter(e.target.value)} style={{ padding: '6px' }}>
+            <option value="">All Sources</option>
+            <option value="DNP">DNP</option>
+            <option value="STOREFRONT">Q-Commerce</option>
+          </select>
+        </div>
+        <div>
+          <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '4px' }}>Status</label>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ padding: '6px' }}>
+            <option value="">All Statuses</option>
+            <option value="DRAFT">Draft</option>
+            <option value="CONFIRMED">Confirmed</option>
+            <option value="PLACED">Placed</option>
+            <option value="PACKED">Packed</option>
+            <option value="DELIVERED">Delivered</option>
+            <option value="INVOICED">Invoiced</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+      </div>
+
       {loading ? (
         <p>Loading...</p>
       ) : (
@@ -95,7 +138,8 @@ export default function AdminOrders() {
             <tr style={{ background: '#ddd' }}>
               <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Order ID</th>
               <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Date</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Retailer</th>
+              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Source</th>
+              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Customer</th>
               <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Rep</th>
               <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Items</th>
               <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'right' }}>Total (NPR)</th>
@@ -108,8 +152,13 @@ export default function AdminOrders() {
                 <td style={{ padding: '8px', border: '1px solid #ccc' }}>#{o.id}</td>
                 <td style={{ padding: '8px', border: '1px solid #ccc' }}>{new Date(o.createdAt).toLocaleString()}</td>
                 <td style={{ padding: '8px', border: '1px solid #ccc' }}>
-                  {o.retailerName}<br/>
-                  <small style={{ color: '#666' }}>{o.retailerLocation}</small>
+                  <span style={{ padding: '2px 6px', background: o.source === 'STOREFRONT' ? '#dbeafe' : '#f3f4f6', borderRadius: '4px', fontSize: '0.8rem' }}>
+                    {o.source || 'DNP'}
+                  </span>
+                </td>
+                <td style={{ padding: '8px', border: '1px solid #ccc' }}>
+                  {o.retailerName || 'Guest User'}<br/>
+                  <small style={{ color: '#666' }}>{o.retailerLocation || 'Q-Commerce Delivery'}</small>
                 </td>
                 <td style={{ padding: '8px', border: '1px solid #ccc' }}>{o.repName || 'Self (Admin)'}</td>
                 <td style={{ padding: '8px', border: '1px solid #ccc' }}>
@@ -127,13 +176,24 @@ export default function AdminOrders() {
                 <td style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'center' }}>
                   <select 
                     value={o.status} 
-                    onChange={(e) => updateStatus(o.id, e.target.value)}
+                    onChange={(e) => updateStatus(o, e.target.value)}
                     style={{ padding: '4px' }}
                   >
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
+                    {o.source === 'STOREFRONT' ? (
+                      <>
+                        <option value="PLACED">Placed</option>
+                        <option value="PACKED">Packed</option>
+                        <option value="DELIVERED">Delivered</option>
+                        <option value="CANCELLED">Cancelled</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="DRAFT">Draft</option>
+                        <option value="CONFIRMED">Confirmed</option>
+                        <option value="INVOICED">Invoiced</option>
+                        <option value="CANCELLED">Cancelled</option>
+                      </>
+                    )}
                   </select>
                 </td>
               </tr>

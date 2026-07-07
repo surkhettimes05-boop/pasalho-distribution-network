@@ -82,3 +82,84 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// Background Sync
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-orders') {
+    event.waitUntil(syncDraftOrders());
+  }
+});
+
+async function syncDraftOrders() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open('pasalho-local', 1);
+    req.onsuccess = async (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('drafts')) {
+        resolve();
+        return;
+      }
+      
+      const tx = db.transaction('drafts', 'readonly');
+      const store = tx.objectStore('drafts');
+      const draftsRequest = store.getAll();
+      const keysRequest = store.getAllKeys();
+      
+      tx.oncomplete = async () => {
+        const drafts = draftsRequest.result;
+        const keys = keysRequest.result;
+        
+        if (!drafts || drafts.length === 0) {
+          resolve();
+          return;
+        }
+
+        try {
+          // Attempt to sync all drafts
+          for (let i = 0; i < drafts.length; i++) {
+            const draft = drafts[i];
+            const key = keys[i];
+            
+            // Assume draft contains the auth token or we rely on session
+            // In a real PWA we'd need to ensure auth headers are passed correctly
+            const res = await fetch('/api/orders', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                // Wait, service worker doesn't have the auth token if it's in localStorage.
+                // We'll pass the token inside the draft payload for offline sync
+                'Authorization': `Bearer ${draft._token || ''}`
+              },
+              body: JSON.stringify(draft.payload || draft)
+            });
+            
+            if (res.ok) {
+              // Delete from indexedDB upon successful sync
+              const delTx = db.transaction('drafts', 'readwrite');
+              delTx.objectStore('drafts').delete(key);
+              await new Promise(r => delTx.oncomplete = r);
+            } else if (res.status >= 400 && res.status < 500) {
+              // Business logic error (e.g. stock out). Mark as error so UI can show it.
+              let errorMsg = 'Validation Error';
+              try {
+                const data = await res.json();
+                if (data.error) errorMsg = data.error;
+              } catch (e) {}
+              
+              const updateTx = db.transaction('drafts', 'readwrite');
+              const store = updateTx.objectStore('drafts');
+              draft.syncError = errorMsg;
+              store.put(draft, key);
+              await new Promise(r => updateTx.oncomplete = r);
+            }
+          }
+          resolve();
+        } catch (err) {
+          console.error('Background sync failed:', err);
+          reject(err);
+        }
+      };
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
