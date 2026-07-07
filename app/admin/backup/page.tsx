@@ -120,17 +120,17 @@ export default function AdminBackupPage() {
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         
         {/* Navigation / Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 35 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', justifyContent: 'space-between', alignItems: 'center', marginBottom: 35 }}>
           <div>
             <Link href="/" style={{ color: '#94a3b8', textDecoration: 'none', fontSize: 14, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 6, transition: 'color 0.2s' }}>
               ← Return to Order Capture
             </Link>
-            <h1 style={{ margin: '8px 0 0 0', fontSize: 32, fontWeight: 800, background: 'linear-gradient(to right, #38bdf8, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <h1 style={{ margin: '8px 0 0 0', fontSize: 32, fontWeight: 800, background: 'linear-gradient(to right, #38bdf8, #818cf8)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', wordBreak: 'break-word' }}>
               Google Drive Backup Center
             </h1>
           </div>
           {currentRep && (
-            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '10px 16px', textAlign: 'right' }}>
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '10px 16px', textAlign: 'left' }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#e2e8f0' }}>{currentRep.name}</div>
               <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>Admin Administrator</div>
             </div>
@@ -244,7 +244,7 @@ export default function AdminBackupPage() {
                 <div style={{ color: '#64748b', fontSize: 12, marginTop: 4 }}>Trigger a manual backup above to create your first save.</div>
               </div>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
+              <div className="overflow-x-auto">
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>

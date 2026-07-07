@@ -86,7 +86,7 @@ export default function AdminOrders() {
 
   return (
     <div>
-      <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
         <h2>All Orders (Master View)</h2>
         <button
           onClick={handleExport}
@@ -106,7 +106,7 @@ export default function AdminOrders() {
         </button>
       </div>
 
-      <div style={{ marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
+      <div style={{ marginBottom: '1rem', display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '4px' }}>Source</label>
           <select value={sourceFilter} onChange={e => setSourceFilter(e.target.value)} style={{ padding: '6px' }}>
@@ -133,73 +133,75 @@ export default function AdminOrders() {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
-          <thead>
-            <tr style={{ background: '#ddd' }}>
-              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Order ID</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Date</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Source</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Customer</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Rep</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Items</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'right' }}>Total (NPR)</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'center' }}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map(o => (
-              <tr key={o.id}>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>#{o.id}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{new Date(o.createdAt).toLocaleString()}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>
-                  <span style={{ padding: '2px 6px', background: o.source === 'STOREFRONT' ? '#dbeafe' : '#f3f4f6', borderRadius: '4px', fontSize: '0.8rem' }}>
-                    {o.source || 'DNP'}
-                  </span>
-                </td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>
-                  {o.retailerName || 'Guest User'}<br/>
-                  <small style={{ color: '#666' }}>{o.retailerLocation || 'Q-Commerce Delivery'}</small>
-                </td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{o.repName || 'Self (Admin)'}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>
-                  <ul style={{ margin: 0, paddingLeft: '1rem' }}>
-                    {o.items?.map((item: any, idx: number) => (
-                      <li key={idx} style={{ fontSize: '0.85rem' }}>
-                        {item.quantity}x {item.productName}
-                      </li>
-                    ))}
-                  </ul>
-                </td>
-                <td style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'right', fontWeight: 'bold' }}>
-                  {Number(o.totalAmount || 0).toLocaleString()}
-                </td>
-                <td style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'center' }}>
-                  <select 
-                    value={o.status} 
-                    onChange={(e) => updateStatus(o, e.target.value)}
-                    style={{ padding: '4px' }}
-                  >
-                    {o.source === 'STOREFRONT' ? (
-                      <>
-                        <option value="PLACED">Placed</option>
-                        <option value="PACKED">Packed</option>
-                        <option value="DELIVERED">Delivered</option>
-                        <option value="CANCELLED">Cancelled</option>
-                      </>
-                    ) : (
-                      <>
-                        <option value="DRAFT">Draft</option>
-                        <option value="CONFIRMED">Confirmed</option>
-                        <option value="INVOICED">Invoiced</option>
-                        <option value="CANCELLED">Cancelled</option>
-                      </>
-                    )}
-                  </select>
-                </td>
+        <div className="overflow-x-auto">
+          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
+            <thead>
+              <tr style={{ background: '#ddd' }}>
+                <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Order ID</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Date</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Source</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Customer</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Rep</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'left' }}>Items</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'right' }}>Total (NPR)</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'center' }}>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map(o => (
+                <tr key={o.id}>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>#{o.id}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{new Date(o.createdAt).toLocaleString()}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>
+                    <span style={{ padding: '2px 6px', background: o.source === 'STOREFRONT' ? '#dbeafe' : '#f3f4f6', borderRadius: '4px', fontSize: '0.8rem' }}>
+                      {o.source || 'DNP'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>
+                    {o.retailerName || 'Guest User'}<br/>
+                    <small style={{ color: '#666' }}>{o.retailerLocation || 'Q-Commerce Delivery'}</small>
+                  </td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{o.repName || 'Self (Admin)'}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>
+                    <ul style={{ margin: 0, paddingLeft: '1rem' }}>
+                      {o.items?.map((item: any, idx: number) => (
+                        <li key={idx} style={{ fontSize: '0.85rem' }}>
+                          {item.quantity}x {item.productName}
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'right', fontWeight: 'bold' }}>
+                    {Number(o.totalAmount || 0).toLocaleString()}
+                  </td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc', textAlign: 'center' }}>
+                    <select 
+                      value={o.status} 
+                      onChange={(e) => updateStatus(o, e.target.value)}
+                      style={{ padding: '4px' }}
+                    >
+                      {o.source === 'STOREFRONT' ? (
+                        <>
+                          <option value="PLACED">Placed</option>
+                          <option value="PACKED">Packed</option>
+                          <option value="DELIVERED">Delivered</option>
+                          <option value="CANCELLED">Cancelled</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="DRAFT">Draft</option>
+                          <option value="CONFIRMED">Confirmed</option>
+                          <option value="INVOICED">Invoiced</option>
+                          <option value="CANCELLED">Cancelled</option>
+                        </>
+                      )}
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

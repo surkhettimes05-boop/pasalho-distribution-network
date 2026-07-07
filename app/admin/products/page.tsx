@@ -83,7 +83,7 @@ export default function AdminProducts() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: '1rem', gap: '1rem' }}>
         <h2>Manage Products</h2>
         <button onClick={() => setShowForm(true)}>Add Product</button>
       </div>
@@ -91,7 +91,7 @@ export default function AdminProducts() {
       {showForm && (
         <div style={{ background: '#eee', padding: '1rem', marginBottom: '1rem', border: '1px solid #ccc' }}>
           <h3>{editingId ? 'Edit Product' : 'New Product'}</h3>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-end' }}>
             <div>
               <label style={{ display: 'block' }}>Name</label>
               <input required value={name} onChange={e => setName(e.target.value)} />
@@ -128,9 +128,9 @@ export default function AdminProducts() {
               <label style={{ display: 'block' }}>Active</label>
               <input type="checkbox" checked={isActive} onChange={e => setIsActive(e.target.checked)} />
             </div>
-            <div>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
               <button type="submit">Save</button>
-              <button type="button" onClick={() => setShowForm(false)} style={{ marginLeft: '0.5rem' }}>Cancel</button>
+              <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
           </form>
         </div>
@@ -139,38 +139,40 @@ export default function AdminProducts() {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
-          <thead>
-            <tr style={{ background: '#ddd' }}>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>ID</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Name</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Price</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>MRP</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Selling Price</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Stock</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Category</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Active</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map(p => (
-              <tr key={p.id}>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.id}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.name}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.price || p.costPrice}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.mrp}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.sellingPrice}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.stock}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.storefrontCategory}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.isActive ? 'Yes' : 'No'}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>
-                  <button onClick={() => handleEdit(p)}>Edit</button>
-                </td>
+        <div className="overflow-x-auto">
+          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
+            <thead>
+              <tr style={{ background: '#ddd' }}>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>ID</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Name</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Price</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>MRP</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Selling Price</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Stock</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Category</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Active</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {products.map(p => (
+                <tr key={p.id}>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.id}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.name}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.price || p.costPrice}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.mrp}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.sellingPrice}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.stock}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.storefrontCategory}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{p.isActive ? 'Yes' : 'No'}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>
+                    <button onClick={() => handleEdit(p)}>Edit</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

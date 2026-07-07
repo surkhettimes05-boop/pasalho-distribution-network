@@ -59,7 +59,7 @@ export default function AdminRetailers() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: '1rem', gap: '1rem' }}>
         <h2>Manage Retailers</h2>
         <button onClick={() => setShowForm(true)}>Add Retailer</button>
       </div>
@@ -67,7 +67,7 @@ export default function AdminRetailers() {
       {showForm && (
         <div style={{ background: '#eee', padding: '1rem', marginBottom: '1rem', border: '1px solid #ccc' }}>
           <h3>{editingId ? 'Edit Retailer' : 'New Retailer'}</h3>
-          <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end' }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-end' }}>
             <div>
               <label style={{ display: 'block' }}>Name</label>
               <input required value={name} onChange={e => setName(e.target.value)} />
@@ -80,9 +80,9 @@ export default function AdminRetailers() {
               <label style={{ display: 'block' }}>Phone</label>
               <input required value={phone} onChange={e => setPhone(e.target.value)} />
             </div>
-            <div>
+            <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
               <button type="submit">Save</button>
-              <button type="button" onClick={() => setShowForm(false)} style={{ marginLeft: '0.5rem' }}>Cancel</button>
+              <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
             </div>
           </form>
         </div>
@@ -91,30 +91,32 @@ export default function AdminRetailers() {
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
-          <thead>
-            <tr style={{ background: '#ddd' }}>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>ID</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Name</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Location</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Phone</th>
-              <th style={{ padding: '8px', border: '1px solid #ccc' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {retailers.map(r => (
-              <tr key={r.id}>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{r.id}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{r.name}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{r.location}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>{r.phone}</td>
-                <td style={{ padding: '8px', border: '1px solid #ccc' }}>
-                  <button onClick={() => handleEdit(r)}>Edit</button>
-                </td>
+        <div className="overflow-x-auto">
+          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ccc' }}>
+            <thead>
+              <tr style={{ background: '#ddd' }}>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>ID</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Name</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Location</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Phone</th>
+                <th style={{ padding: '8px', border: '1px solid #ccc' }}>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {retailers.map(r => (
+                <tr key={r.id}>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{r.id}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{r.name}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{r.location}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>{r.phone}</td>
+                  <td style={{ padding: '8px', border: '1px solid #ccc' }}>
+                    <button onClick={() => handleEdit(r)}>Edit</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
