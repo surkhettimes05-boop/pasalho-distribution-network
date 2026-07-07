@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { pool } from '@/lib/db';
+import { getCurrentRepFromAuthHeader } from '@/lib/getCurrentRep';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+  const current = getCurrentRepFromAuthHeader(request);
+  if (!current) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   try {
     const { searchParams } = new URL(request.url);
     const distributorId = searchParams.get('distributorId') || 'pasalho-001';
@@ -19,8 +23,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
-import { getCurrentRepFromAuthHeader } from '@/lib/getCurrentRep';
 
 export async function POST(request: Request) {
   const current = getCurrentRepFromAuthHeader(request);

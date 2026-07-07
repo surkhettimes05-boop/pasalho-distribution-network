@@ -62,3 +62,12 @@ To prevent hallucinations in conversational or Live API contexts, strictly enfor
 
 ## 7. Proactive System-Level Optimization
 At the infrastructure layer, treat agent prompts as query plans, analyzing the DAG of the multi-agent workflow to pre-compute and proactively cache KV states for shared templates and context.
+
+---
+
+# Styling Rules
+
+## 1. No Tailwind CSS
+This project does NOT have Tailwind CSS installed or configured. 
+*   **Always use inline styles** (`style={{...}}`) or custom CSS within `<style>` blocks.
+*   **Do NOT reach for `className`** with Tailwind utility classes (e.g. `flex-1`, `md:hidden`, `overflow-x-auto`) because they will not render and will cause styling regressions.
