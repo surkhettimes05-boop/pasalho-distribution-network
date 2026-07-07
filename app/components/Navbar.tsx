@@ -151,7 +151,7 @@ export default function Navbar() {
       <header className="pdn-navbar">
         {/* Logo */}
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-          <img src="/logo-full.png" alt="Pasalho DNP" style={{ height: '28px', width: 'auto', filter: 'brightness(0) invert(1)' }} />
+          <img src="/logo-full.png" alt="Pasalho DNP" style={{ height: '28px', width: 'auto' }} />
         </Link>
 
         {/* Desktop nav links */}

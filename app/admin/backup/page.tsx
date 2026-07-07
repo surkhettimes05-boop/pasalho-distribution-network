@@ -244,7 +244,7 @@ export default function AdminBackupPage() {
                 <div style={{ color: '#64748b', fontSize: 12, marginTop: 4 }}>Trigger a manual backup above to create your first save.</div>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14, textAlign: 'left' }}>
                   <thead>
                     <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
